@@ -1,12 +1,20 @@
 import yfinance as yf
+from helpers import helpers as hlp
 
 class stock:
     def __init__(self, ticker, buy_price, num_stocks, buy_fees_eur):
         self.ticker = yf.Ticker(ticker)
+
+        try:
+            self.i =  self.ticker.info
+        except:
+            raise ValueError("Invalid ticker!")
+            
         self.name = ticker
         self.buy_price = buy_price
         self.num_stocks = num_stocks
         self.buy_fees_eur = buy_fees_eur
+        self.buy_fees_usd = round(buy_fees_eur * hlp.eurusd(), 2)
 
         self.history = None
         self.info = None
@@ -19,8 +27,8 @@ class stock:
         self.earnings = None
     
     #get information methods
-    def get_history(self):
-        self.history = self.ticker.history(period = '5y')
+    def get_history(self, p = "5y", i = "1d"):
+        self.history = self.ticker.history(period = p, interval = i)
 
     def get_info(self):
         self.info = self.ticker.info
@@ -48,15 +56,15 @@ class stock:
 
     # calculation methods
     def get_currentValue(self):
-        return round(self.history.Close[-1], 2)
+        return round(self.history.Close[-1] if self.history.Close[-1] is not None else 0, 2)
 
     def calc_valueChange(self):
-        prev_close = self.history.Close[-2]
-        last_close = self.history.Close[-1]
+        prev_close = hlp.validate(self.history.Close[-2])
+        last_close = hlp.validate(self.history.Close[-1])
         return round(100 / prev_close * (last_close - prev_close), 2)
     
     def calc_profit(self):
-        return round(self.history.Close[-1] - self.buy_price, 2)
+        return round(hlp.validate(self.history.Close[-1]) - self.buy_price, 2)
 
     def calc_profitChange(self):
-        return round(100 / self.buy_price * self.history.Close[-1] - 100, 2)
+        return round(100 / self.buy_price * hlp.validate(self.history.Close[-1]) - 100, 2)

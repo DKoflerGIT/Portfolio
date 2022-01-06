@@ -1,0 +1,77 @@
+.root {
+    font-family: Calibri, 'Trebuchet MS', sans-serif;
+    margin: 0ex;
+    padding: 0ex;
+    height: 100%;
+    width: 100%;
+}
+
+.header {
+    background-color:#ffffff;
+    top: 0ex;
+    height: 10ex;
+    width: 100%;
+}
+
+.overview {
+    background-color:#e6e6e6;
+    height: 50ex;
+    min-height: 50ex;
+    top: 10ex;
+    padding: 1ex;
+    width: 100%;
+}
+
+.stocks {
+    background-color:#e6e6e6;
+    padding: 2ex;
+    bottom: 0ex;
+    min-height: 50ex;
+    position: absolute;
+    top: 60ex;
+    width: 100%;
+}
+
+.portfolio {
+    background-color:#e6e6e6;
+    margin-bottom: 2ex;
+    min-height: 20ex;
+    padding: 1ex;
+}
+
+.watchlist {
+    background-color:#e6e6e6;
+    min-height: 20ex;
+    padding: 1ex;
+}
+
+.item {
+    background-color:#ffffff;
+    border-top-left-radius: 2ex;
+    border-top-right-radius: 2ex;
+    border-bottom-left-radius: 2ex;
+    border-bottom-right-radius: 2ex;
+}
+
+.placeholder {
+    background-color:#000000;
+    margin: 2ex;
+}
+
+.heading1 {
+    background-color: burlywood;
+    font-size: 5ex;
+}
+
+.heading2 {
+    font-size: 4ex;
+    margin: 0;
+    padding: 0;
+}
+
+.header_image {
+    height: 10ex;
+    object-fit:cover;
+    width: 100%;
+    opacity: 0.5;
+}

@@ -1,10 +1,21 @@
-def main():
-    import yfinance as yf
-    import matplotlib.pyplot as plt
-    import pandas as pd
+import yfinance as yf
+from matplotlib import pyplot as plt
+import pandas as pd
+from fastapi import FastAPI
 
-    from classes import stock as stock
+from classes import stock as stock
 
+app = FastAPI()
+path = "/finances/investing"
+
+# uvicorn main:app --reload
+
+@app.get(path)
+def test():
+    return "successful"
+
+@app.get(path + "/overview")
+def overview():
     stocks_bought = pd.read_excel('data\stocks_bought.xlsx')
 
     stocks = []
@@ -17,5 +28,21 @@ def main():
         s = stock.stock(t, bp, ns, bf)
         stocks.append(s)
 
-if __name__ == '__main__':
-    main()
+        p = []
+        for s in stocks:
+            s.get_history("5d", "1d")
+            p.append(s.calc_profitChange())
+        
+    return "    ".join(s.name + " " + str(p[i]) + " %" for i, s in enumerate(stocks))
+
+@app.get(path + "/stock/{ticker}")
+def stockOverview(ticker: str):
+    s = stock.stock(ticker, 0, 0, 0)
+    try:
+        s.get_history()
+        lastval = s.get_currentValue()
+    except:
+        lastval = 'Invalid ticker or no information availlable!'
+
+    return lastval
+    
