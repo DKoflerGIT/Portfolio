@@ -7,3 +7,5 @@ elemental==0.4.0
 openpyxl==3.0.9
 fastapi==0.70.1
 uvicorn==0.16.0
+Jinja2==3.0.3
+SQLAlchemy==1.4.29

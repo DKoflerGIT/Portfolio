@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<script>
+    function initTable(){
+        var element = document.getElementById("tableBody");
+        var data = {{ data }};
+        document.createElement("tr")
+
+    }
+    
+</script>
+
+<div style="padding: 2ex;">
+    
+    <table class="ui sortable celled table">
+        <thead>
+            <tr>
+                <th>Ticker</th>
+                <th>Stock Value Change</th>
+                <th>Profit</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            
+        </tbody>
+        <tfoot>
+            <tr>
+                <th>3 Stocks</th>
+                <th></th>
+                <th></th>
+                <th>Total Equity: 11000</th>
+            </tr>
+        </tfoot>
+    </table>
+
+
+</div>
+{% endblock %}

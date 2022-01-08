@@ -1,27 +1,28 @@
-import yfinance as yf
-from helpers import helpers as hlp
+from typing import Optional
+#from pydantic import BaseModel
+from functions import helpers as hlp
 
-class stock:
-    def __init__(self, ticker, data, buy_price, num_stocks, buy_fees_eur):           
+class Stock():
+    def __init__(self, ticker, data, buyPrice, buyAmount, buyFeeEur):           
         self.ticker = ticker
         self.data = data
-        self.buy_price = buy_price
-        self.num_stocks = num_stocks
-        self.buy_fees_eur = buy_fees_eur
-        self.buy_fees_usd = round(buy_fees_eur * hlp.eurusd(), 2)
+        self.buyPrice = buyPrice
+        self.buyAmount = buyAmount
+        self.buyFeeEur = buyFeeEur
+        self.buyFeeUsd = hlp.eurToUsd(buyFeeEur)
 
     # calculation methods
-    def get_value(self):
+    def getValue(self):
         return round(self.data['Close'][-1], 2)
 
-    def calc_valueChange(self):
+    def calcValueChange(self):
         return round(self.data['Close'][-1] - self.data['Close'][-2], 2)
 
-    def calc_valueChangePercent(self):
+    def calcValueChangePercent(self):
         return round(100 / self.data['Close'][-2] * (self.data['Close'][-1] - self.data['Close'][-2]), 2)
     
-    def calc_profit(self):
-        return round(self.data['Close'][-1] - self.buy_price, 2)
+    def calcProfit(self):
+        return round(self.data['Close'][-1] - self.buyPrice, 2)
 
-    def calc_profitPercent(self):
-        return round(100 / self.buy_price * self.data['Close'][-1] - 100, 2)
+    def calcProfitPercent(self):
+        return round(100 / self.buyPrice * self.data['Close'][-1] - 100, 2)
