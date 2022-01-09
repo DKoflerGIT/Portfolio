@@ -1,62 +1,96 @@
+# region Imports
 from fastapi import templating
 from numpy import double
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends, BackgroundTasks
 from fastapi.templating import Jinja2Templates
-from typing import Optional
-from pydantic import BaseModel
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, session
 import yfinance as yf
+from classes.stock import Stock
 
 # local utilities
-from classes import stock as Stock
-from functions import stockFunctions as sf, models
-from functions.database import SessionLocal, engine
+from classes.stockRequest import StockRequest
+from database import models, dbFunctions as dbF
+from functions import stockFunctions as sF
+from database.database import SessionLocal, engine
+from database.models import Stock as dbModelStock
+
+# endregion
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 models.Base.metadata.create_all(bind=engine)
 
-stocks = []
-pathFinances = "/finances"
+# region Home
 
-# ./run
-
-
-# /
 @app.get("/")
 def home(request: Request):
-    return templates.TemplateResponse("home.html", { "request" : request, "title" : "Home" })
+    dataDict = {
+        "request" : request,
+        "title" : "Home"
+    }
+    return templates.TemplateResponse("home.html", dataDict)
+# endregion
 
+# region Portfolio
 
-# Overview of stocks in portfolio
-# /finances/stocks/portfolio
-@app.get(pathFinances + "/stocks/portfolio")
+# Overview /finances/stocks/portfolio
+@app.get("/finances/stocks/portfolio")
 def portfolio(request: Request):
-    stocks = sf.refreshStocks()
-    data = {}
-    for s in stocks:
-        data[s.ticker] = {
-            'value' :  s.getValue(),
-            'valueChange' :  s.calcValueChange(),
-            'valueChangePercent' :  s.calcValueChangePercent(),
-            'buyPrice' :  s.buyPrice,
-            'profitPercent' : s.calcProfitPercent()
-            }
+    stocks = sF.fetchStockDataPortfolio()
 
-    # return data
-    return templates.TemplateResponse("portfolio.html", { "request" : request, "title" : "Portfolio" })
+    if stocks:
+        pStocks = []
+        for s in stocks:
+            pStocks.append([s.ticker, s.getValue(), s.calcValue1dChange(), str(s.calcValueChange1dPercent()) + ' %', str(s.calcProfitPercent()) + ' %'])
 
-
-# Add a stock to the portfolio
-# /finances/stocks/portfolio/add-stock
-@app.post(pathFinances + "/stocks/portfolio/add-stock")
-def addStock(ticker: str, buyPrice: double, buyAmount: double, buyFees: double):
-    return {"error" : "not implemented yet"}
+    dataDict = {
+        "request" : request,
+        "title" : "Portfolio",
+        "stocks" : pStocks if stocks else None
+    }
+    return templates.TemplateResponse("portfolio.html", dataDict)
 
 
-# Get info about a specific stock
-# /finances/stocks/[ticker]
-@app.get(pathFinances + "/stocks/{ticker}")
+# Add a stock /finances/stocks/portfolio/add-stock
+@app.post("/finances/stocks/portfolio/add-stock")
+async def portfolioAdd(stockRequest: StockRequest, backgroundTasks: BackgroundTasks):
+    backgroundTasks.add_task(sF.saveStockToDB(stockRequest.ticker, stockRequest.buyPrice, stockRequest.buyAmount, stockRequest.buyFeeEur))
+
+# endregion
+
+# region Watchlist
+
+# Overview /finances/stocks/watchlist
+@app.get("/finances/stocks/watchlist")
+def watchlist(request: Request): 
+    stocks = sF.fetchStockDataWatchlist() # list of watchlist stock objects
+
+    if stocks:
+        wStocks = []
+        for s in stocks:
+            wStocks.append([s.ticker, s.getValue(), s.calcValue1dChange(), str(s.calcValueChange1dPercent()) + ' %'])
+
+    dataDict = {
+        "request" : request,
+        "title" : "Watchlist",
+        "stocks" : wStocks if stocks else None
+    }
+
+    return templates.TemplateResponse("watchlist.html", dataDict)
+    # return dataDict
+
+
+# Add a stock /finances/stocks/watchlist/add-stock
+@app.post("/finances/stocks/watchlist/add-stock")
+async def watchlistAdd(stockRequest: StockRequest, backgroundTasks: BackgroundTasks):
+    backgroundTasks.add_task(sF.saveStockToDB(stockRequest.ticker))
+
+# endregion
+
+# region StockInfo
+
+# Get info about a specific stock /finances/stocks/[ticker]
+@app.get("/finances/stocks/{ticker}")
 def stockInfo(ticker: str):
     s = yf.Ticker(ticker)
     try:
@@ -72,4 +106,4 @@ def stockInfo(ticker: str):
             'change' : change
         }
     }
-    
+ # endregion
