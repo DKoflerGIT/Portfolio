@@ -78,6 +78,16 @@ def saveStockToDB(ticker, buyPrice=0, buyAmount=0, buyFeeEur=0):
     return True
 
 
+def deleteStockFromDB(ticker):
+    db = SessionLocal()
+    try:
+        db.query(dbModelStock).filter(dbModelStock.ticker==ticker).delete()
+        db.commit()
+    except:
+        return False
+    return True
+
+
 def fetchStockDataWeb(ticker: str):
     yfStock = yf.Ticker(ticker)
     try:

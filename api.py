@@ -53,8 +53,14 @@ def portfolio(request: Request):
 
 # Add a stock /finances/stocks/portfolio/add-stock
 @app.post("/finances/stocks/portfolio/add-stock")
-async def portfolioAdd(stockRequest: StockRequest, backgroundTasks: BackgroundTasks):
+async def portfolioAddStock(stockRequest: StockRequest, backgroundTasks: BackgroundTasks):
     backgroundTasks.add_task(sF.saveStockToDB(stockRequest.ticker, stockRequest.buyPrice, stockRequest.buyAmount, stockRequest.buyFeeEur))
+
+
+# Remove a stock /finances/stocks/portfolio/remove-stock
+@app.delete("/finances/stocks/portfolio/remove-stock")
+async def portfolioDeleteStock(stockRequest: StockRequest, backgroundTasks: BackgroundTasks):
+    backgroundTasks.add_task(sF.deleteStockFromDB(stockRequest.ticker))
 
 # endregion
 
@@ -82,8 +88,14 @@ def watchlist(request: Request):
 
 # Add a stock /finances/stocks/watchlist/add-stock
 @app.post("/finances/stocks/watchlist/add-stock")
-async def watchlistAdd(stockRequest: StockRequest, backgroundTasks: BackgroundTasks):
+async def watchlistAddStock(stockRequest: StockRequest, backgroundTasks: BackgroundTasks):
     backgroundTasks.add_task(sF.saveStockToDB(stockRequest.ticker))
+
+
+# Remove a stock /finances/stocks/watchlist/remove-stock
+@app.delete("/finances/stocks/watchlist/remove-stock")
+async def watchlistRemoveStock(stockRequest: StockRequest, backgroundTasks: BackgroundTasks):
+    backgroundTasks.add_task(sF.deleteStockFromDB(stockRequest.ticker))
 
 # endregion
 

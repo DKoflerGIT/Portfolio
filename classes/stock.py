@@ -26,13 +26,22 @@ class Stock():
 
     # calculation methods
     def getValue(self):
-        return round(self.data['Close'][-1], 2)
+        # yfStock = yf.Ticker(self.ticker)
+        # d = yfStock.history(period='1d')
+        # return round(d.Close[-1], 2)
+        return round(self.data.Close[-1], 2)
 
     def calcValue1dChange(self):
-        return round(self.data['Close'][-1] - self.data['Close'][-2], 2)
+        # yfStock = yf.Ticker(self.ticker)
+        # d = yfStock.history(period='5d')
+        # return round(d.Close[-1] - d.Close[-2], 2)
+        return round(self.data.Close[-1] - self.data.Close[-2], 2)
 
     def calcValueChange1dPercent(self):
-        return round(100 / self.data['Close'][-2] * (self.data['Close'][-1] - self.data['Close'][-2]), 2)
+        # yfStock = yf.Ticker(self.ticker)
+        # d = yfStock.history(period='5d')
+        # return round(100 / d.Close[-2] * (d.Close[-1] - d.Close[-2]), 2)
+        return round(100 / self.data.Close[-2] * (self.data.Close[-1] - self.data.Close[-2]), 2)
     
     def calcProfit(self):
         if self.buyPrice == 0:
@@ -42,4 +51,7 @@ class Stock():
     def calcProfitPercent(self):
         if self.buyPrice == 0:
             return 0
-        return round(100 / self.buyPrice * self.data['Close'][-1] - 100, 2)
+        # yfStock = yf.Ticker(self.ticker)
+        # d = yfStock.history(period='1d')
+        # return round(100 / self.buyPrice * d.Close[-1] - 100, 2)
+        return round(100 / self.buyPrice * self.data.Close[-1] - 100, 2)
