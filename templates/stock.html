@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<script>
+    $(document).ready(function() {
+        $("#tabHistory").click( function() {
+            $("#tabHistory").addClass("ui bottom attached active tab segment");
+            $("#tabBalanceSheet").addClass("ui bottom attached tab segment");
+            $("#tabCashflows").addClass("ui bottom attached tab segment");
+            $("#tabDividends").addClass("ui bottom attached tab segment");
+        });
+
+        $("#tabBalanceSheet").click( function() {
+            $("#tabHistory").addClass("ui bottom attached tab segment");
+            $("#tabBalanceSheet").addClass("ui bottom attached active tab segment");
+            $("#tabCashflows").addClass("ui bottom attached tab segment");
+            $("#tabDividends").addClass("ui bottom attached tab segment");
+        });
+
+        $("#tabCashflows").click( function() {
+            $("#tabHistory").addClass("ui bottom attached tab segment");
+            $("#tabBalanceSheet").addClass("ui bottom attached tab segment");
+            $("#tabCashflows").addClass("ui bottom attached active tab segment");
+            $("#tabDividends").addClass("ui bottom attached tab segment");
+        });
+
+        $("#tabDividends").click( function() {
+            $("#tabHistory").addClass("ui bottom attached tab segment");
+            $("#tabBalanceSheet").addClass("ui bottom attached tab segment");
+            $("#tabCashflows").addClass("ui bottom attached tab segment");
+            $("#tabDividends").addClass("ui bottom attached active tab segment");
+        });
+
+        v =$("#changeLabel").text();
+        v = parseFloat(v.substring(0, v.length - 2));
+        if(v < 0) $("#changeLabel").addClass("ui large red label");
+        else if (v > 0) $("#changeLabel").addClass("ui large green label");
+
+    });
+</script>
+
+<div class="ui breadcrumb">
+    <div class="section"><a href="http://127.0.0.1:8000/">Home</a></div>
+    <i class="right chevron icon divider"></i>
+    <div class="section">Finances</div>
+    <i class="right chevron icon divider"></i>
+    <div class="section">Stock</div>
+</div>
+
+<h1 class="ui header">{{ title[0] }}</h1>
+<span class="ui large label">{{ ticker }}</span>
+<span id="changeLabel">{{ change }}</span>
+
+<div class="ui tabular menu">
+    <div class="active item" data-tab="tabHistory">History</div>
+    <div class="item" data-tab="tabBalanceSheet">Balance Sheet</div>
+    <div class="item" data-tab="tabCashflows">Cashflows</div>
+    <div class="item" data-tab="tabDividends">Dividends</div>
+</div>
+
+<div id="tabHistory" class="ui bottom attached tab segment" data-tab="tabHistory">
+    tabHistory
+</div>
+<div id="tabBalanceSheet" class="ui bottom attached tab segment" data-tab="tabBalanceSheet">
+    tabBalanceSheet
+</div>
+<div id="tabCashflows" class="ui bottom attached tab segment" data-tab="tabCashflows">
+    tabCashflows
+</div>
+<div id="tabDividends" class="ui bottom attached tab segment" data-tab="tabDividends">
+    tabDividends
+</div>
+
+
+{% endblock %}

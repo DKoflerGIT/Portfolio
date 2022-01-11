@@ -103,19 +103,25 @@ async def watchlistRemoveStock(stockRequest: StockRequest, backgroundTasks: Back
 
 # Get info about a specific stock /finances/stocks/[ticker]
 @app.get("/finances/stocks/{ticker}")
-def stockInfo(ticker: str):
-    s = yf.Ticker(ticker)
-    try:
-        h = s.history(period="5d")
-        lastval = round(h.Close[-1], 2)
-        change = str(round(100 / h.Close[-2] * h.Close[-1] - 100, 2)) + '%'
-    except:
-        return { 'error' : 'Invalid ticker or no information availlable!' }
+def stockinfo(request: Request, ticker: str): 
 
-    return {
-        ticker: {
-            'value' : lastval,
-            'change' : change
-        }
+    stock = yf.Ticker(ticker)
+    history = stock.history(period='5y').Close
+    name = stock.info['shortName'],
+    change = str(round(100 / history[-2] * (history[-1] -  history[-2]), 2)) + ' %'
+    # value
+    # volume
+    # pe
+    # yield
+    # is in portfolio or watchlist
+
+    dataDict = {
+        "request" : request,
+        "title" : name,
+        "ticker" : ticker.upper(),
+        "history" : history,
+        "change" : change
     }
+    return templates.TemplateResponse("stock.html", dataDict)
+
  # endregion

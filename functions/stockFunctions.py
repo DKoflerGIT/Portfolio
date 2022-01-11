@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session, session
 from sqlalchemy.sql import select, or_, and_
 import yfinance as yf, pandas as pd, os
 from datetime import date, timedelta
+import requests
 
 # local utilities
 from classes import stock as stk

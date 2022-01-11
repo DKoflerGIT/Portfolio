@@ -6,7 +6,12 @@
     $(document).ready(function() {
         //Modal to add stocks
         $("#addStockOpenModal").click(function() {
-            $('.ui.basic.modal').modal('show');
+            $('.ui.tiny.modal').modal('show');
+        });
+
+        //refresh site
+        $("#refresh").click(function() {
+            window.location.reload();
         });
 
         //refresh site
@@ -17,7 +22,6 @@
         //add stock to watchlist
         $("#addStockConfirm").click(function() {
             var ticker = $("#addStockTicker").val();
-            console.log(ticker);
 
             $.ajax({
                 url: '/finances/stocks/watchlist/add-stock',
@@ -32,28 +36,43 @@
         });
 
         //remove stock from watchlist
-        function generate_handler( j ) {
+        function generateDeleteHandler( j ) {
             return function(event) {
                 var ticker = $("#ticker" + j).text();
-                console.log(ticker);
-                $.ajax({
-                    url: '/finances/stocks/watchlist/remove-stock',
-                    type: 'DELETE',
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        "ticker" : ticker
-                    }),
-                    dataType: 'json'
-                });
-
-                window.location.reload();
+                $("#removeStockText").text(ticker);
+                $('.mini.modal').modal('show'); 
             };
         }
-        
+
+        //view stock details
+        function generateViewHandler( j ) {
+            return function(event) {
+                var ticker = $("#ticker" + j).text();
+                window.location.replace("/finances/stocks/" + ticker);
+            };
+        }
+
+        $("#removeStockConfirm").click(function() {
+            var ticker = $("#removeStockText").text();
+
+            $.ajax({
+                url: '/finances/stocks/watchlist/remove-stock',
+                type: 'DELETE',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    "ticker" : ticker
+                }),
+                dataType: 'json'
+            });
+
+            window.location.reload();
+        });
+       
         if($("#stockTable >tbody >tr") != null) {
             let n = $("#stockTable >tbody >tr").length;  
             for(var i = 1; i <= n; i++){
-                $('#deleteStock' + i).click( generate_handler( i ) );
+                $('#deleteStock' + i).click( generateDeleteHandler( i ) );
+                $('#viewStock' + i).click( generateViewHandler( i ) );
             }
 
             //color fields
@@ -61,108 +80,141 @@
             for(let i = 1; i <= n; i++) {
                 //color value change fields
                 v =$("#valueChange" + [i]).text();
-                v = parseFloat(v.substring(0, v.length - 2));
-                if(v < 0) $("#valueChange" + [i]).addClass("negative");
-                else if (v > 0) $("#valueChange" + [i]).addClass("positive");
+                v = parseFloat(v.substring(0, v.length));
+                if(v < 0) $("#valueChange" + [i]).addClass("ui large red label");
+                else if (v > 0) $("#valueChange" + [i]).addClass("ui large green label");
 
                 //color relative value change fields
                 v =$("#relValueChange" + [i]).text();
                 v = parseFloat(v.substring(0, v.length - 2));
-                if(v < 0) $("#relValueChange" + [i]).addClass("negative");
-                else if (v > 0) $("#relValueChange" + [i]).addClass("positive");
+                if(v < 0) $("#relValueChange" + [i]).addClass("ui large red label");
+                else if (v > 0) $("#relValueChange" + [i]).addClass("ui large green label");
             }
         }
     });
 </script>
 
-<div style="padding: 2ex;">
+<div class="ui breadcrumb">
+    <div class="section"><a href="http://127.0.0.1:8000/">Home</a></div>
+    <i class="right chevron icon divider"></i>
+    <div class="section">Finances</div>
+    <i class="right chevron icon divider"></i>
+    <div class="section">Watchlist</div>
+</div>
 
-    <!-- Modal to add a stock to the watchlist -->
-    <div class="ui basic modal">
-        <!-- hader -->
-        <div class="ui icon header">
-            <i class="chart area icon"></i>
-            Add Stock to Watchlist
-        </div>
+<h1 class="ui header">{{ title }}</h1>
 
+<!-- Modal to add a stock to the watchlist -->
+<div class="ui tiny modal">
+    <!-- header -->
+    <div class="ui icon header">
+        <i class="chart area icon"></i>
+        Add Stock to Watchlist
+    </div>
+    <div class="content">
         <!-- ticker input textbox -->
         <div class="ui input">
+            
             <input type="text" id="addStockTicker" placeholder="Stock Ticker ...">
-        </div><br>
-
-        <div class="actions">
-
-            <!-- cancel button -->
-            <div id="addStockCancel" class="ui red basic cancel inverted button">
-                <i class="remove icon"></i>
-                Cancel
-            </div>
-
-            <!-- confirm button -->
-            <div id="addStockConfirm" class="ui green ok inverted button">
-                <i class="checkmark icon"></i>
-                Confirm
-            </div>
+            
         </div>
-    </div>
-    
-    <!-- Button to open the add stock modal -->
-    <div class="ui animated button" tabindex="0" id="addStockOpenModal">
-        <div class="hidden content">Add</div>
-        <div class="visible content">
-            <i class="plus icon"></i>
-        </div>
+        <br>
     </div>
 
-    <!-- Button to refresh the site -->
-    <div class="ui animated button" tabindex="1" id="refresh">
-        <div class="hidden content">Refresh</div>
-        <div class="visible content">
-            <i class="refresh icon"></i>
+    <div class="actions">
+
+        <!-- cancel button -->
+        <div id="addStockCancel" class="ui red cancel inverted button">
+            <i class="remove icon"></i>
+            Cancel
+        </div>
+
+        <!-- confirm button -->
+        <div id="addStockConfirm" class="ui green ok inverted button">
+            <i class="checkmark icon"></i>
+            Confirm
         </div>
     </div>
-
-    <!-- Stock table -->
-    <table id="stockTable" class="ui sortable celled table">
-        <thead>
-            <tr>
-                <th><h3 class="ui header">Ticker</h3></th>
-                <th><h3 class="ui header">Value</h3></th>
-                <th><h3 class="ui header">Value Change 1D</h3></th>
-                <th><h3 class="ui header">Relative Value Change 1D</h3></th>
-                <th><h3 class="ui header">Actions</h3></th>
-            </tr>
-        </thead>
-        <tbody id="tableBody">
-            {% if stocks is not none %}
-                {% for stock in stocks %}
-                <tr>
-                    <td id="ticker{{loop.index}}">{{ stock[0] }}</td>
-                    <td>{{ stock[1] }}</td>
-                    <td id="valueChange{{loop.index}}">{{ stock[2] }}</td>
-                    <td id="relValueChange{{loop.index}}">{{ stock[3] }}</td>
-                    <td>
-                        <div class="ui animated button" tabindex="{{ 3 + loop.index }}" id="deleteStock{{ loop.index }}">
-                            <div class="hidden content">Delete</div>
-                            <div class="visible content">
-                                <i class="trash icon"></i>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            {% endif %}
-        </tbody>
-        <tfoot>
-            <tr>
-                <th> {% if stocks is not none %} Number of Stocks: {{ stocks|length }} {% else %}  Number of Stocks: 0 {% endif %}</th>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th></th>
-            </tr>
-        </tfoot>
-    </table>
 </div>
+
+<!-- Modal to confirm removing a stock -->
+<div class="ui mini modal">
+    <div class="header">Remove Stock?</div>
+    <div class="content">
+        <p>Remove <span id="removeStockText" style="font-weight: bold;"></span> from your watchlist?</p>
+    </div>
+    <div class="actions">
+        <!-- cancel button -->
+        <div id="removeStockCancel" class="ui red cancel inverted button">
+            <i class="remove icon"></i>
+            Cancel
+        </div>
+
+        <!-- confirm button -->
+        <div id="removeStockConfirm" class="ui green ok inverted button">
+            <i class="checkmark icon"></i>
+            Yes
+        </div>
+    </div>
+    </div>
+
+<!-- Button to open the add stock modal -->
+<div class="ui animated button" tabindex="0" id="addStockOpenModal">
+    <div class="hidden content">Add</div>
+    <div class="visible content">
+        <i class="plus icon"></i>
+    </div>
+</div>
+
+<!-- Button to refresh the site -->
+<div class="ui animated button" tabindex="1" id="refresh">
+    <div class="hidden content">Refresh</div>
+    <div class="visible content">
+        <i class="refresh icon"></i>
+    </div>
+</div>
+
+<!-- Stock table -->
+<table id="stockTable" class="ui very basic single line table">
+    <thead>
+        <tr>
+            <th><h3 class="ui header">Ticker</h3></th>
+            <th><h3 class="ui header">Value</h3></th>
+            <th><h3 class="ui header">1D Change</h3></th>
+            <th><h3 class="ui header">1D Change %</h3></th>
+            <th><h3 class="ui header"></h3></th>
+        </tr>
+    </thead>
+    <tbody id="tableBody">
+        {% if stocks is not none %}
+            {% for stock in stocks %}
+            <tr>
+                <td id="ticker{{loop.index}}">{{ stock[0] }}</td>
+                <td>{{ stock[1] }}</td>
+                <td><p id="valueChange{{loop.index}}">{{ stock[2] }}</p></td>
+                <td><p id="relValueChange{{loop.index}}">{{ stock[3] }}</p></td>
+                <td>
+                    <button class="ui icon button" tabindex="{{ 3 + loop.index }}" id="deleteStock{{ loop.index }}">
+                        <i class="trash icon"></i>
+                    </button>
+                        
+                    <button class="ui icon button" tabindex="{{ 4 + loop.index }}" id="viewStock{{ loop.index }}">
+                        <i class="search icon"></i>
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        {% endif %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <th> {% if stocks is not none %} Number of Stocks: {{ stocks|length }} {% else %}  Number of Stocks: 0 {% endif %}</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+    </tfoot>
+</table>
 
 {% endblock %}
