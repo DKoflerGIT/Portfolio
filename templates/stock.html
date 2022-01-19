@@ -4,73 +4,102 @@
 
 <script>
     $(document).ready(function() {
-        $("#tabHistory").click( function() {
-            $("#tabHistory").addClass("ui bottom attached active tab segment");
-            $("#tabBalanceSheet").addClass("ui bottom attached tab segment");
-            $("#tabCashflows").addClass("ui bottom attached tab segment");
-            $("#tabDividends").addClass("ui bottom attached tab segment");
-        });
-
-        $("#tabBalanceSheet").click( function() {
-            $("#tabHistory").addClass("ui bottom attached tab segment");
-            $("#tabBalanceSheet").addClass("ui bottom attached active tab segment");
-            $("#tabCashflows").addClass("ui bottom attached tab segment");
-            $("#tabDividends").addClass("ui bottom attached tab segment");
-        });
-
-        $("#tabCashflows").click( function() {
-            $("#tabHistory").addClass("ui bottom attached tab segment");
-            $("#tabBalanceSheet").addClass("ui bottom attached tab segment");
-            $("#tabCashflows").addClass("ui bottom attached active tab segment");
-            $("#tabDividends").addClass("ui bottom attached tab segment");
-        });
-
-        $("#tabDividends").click( function() {
-            $("#tabHistory").addClass("ui bottom attached tab segment");
-            $("#tabBalanceSheet").addClass("ui bottom attached tab segment");
-            $("#tabCashflows").addClass("ui bottom attached tab segment");
-            $("#tabDividends").addClass("ui bottom attached active tab segment");
-        });
-
-        v =$("#changeLabel").text();
+        v = $("#changeLabel").text();
         v = parseFloat(v.substring(0, v.length - 2));
         if(v < 0) $("#changeLabel").addClass("ui large red label");
         else if (v > 0) $("#changeLabel").addClass("ui large green label");
 
+        $('.menu .item').tab();
+
+        let ticker = $("#ticker").text();
+        let url = '/finances/stocks/' + ticker + '/getData';
+
+        $.get( url, function( data ) {
+            let h = data["history"];
+            let x = [];
+            let y = [];
+
+            var d = new Date();
+            d.setDate(d.getDate()-30);
+
+            for (var v in h) {
+                x.push(v);
+                y.push(h[v]);
+            }
+
+            div = document.getElementById('historyPlot');
+
+            var trace1 = {
+                type: 'scatter',
+                x: x,
+                y: y,
+                mode: 'lines',
+                name: 'Blue',
+                line: {
+                    color: 'rgb(120, 120, 120)',
+                    width: 1
+                }
+            };
+
+            var data = [trace1];
+
+            Plotly.newPlot(
+                div,
+                data
+            );
+
+            $("#open").text(data["open"]);
+            $("#close").text(data["close"]);
+            $("#high").text(data["high"]);
+            $("#low").text(data["low"]);
+        }, "json" );
     });
+
 </script>
 
 <div class="ui breadcrumb">
-    <div class="section"><a href="http://127.0.0.1:8000/">Home</a></div>
+    <div class="section"><a href="http://127.0.0.1:8000/"><i class="home icon"></i></a></div>
     <i class="right chevron icon divider"></i>
     <div class="section">Finances</div>
     <i class="right chevron icon divider"></i>
     <div class="section">Stock</div>
 </div>
 
-<h1 class="ui header">{{ title[0] }}</h1>
-<span class="ui large label">{{ ticker }}</span>
+<h1 id="title" class="ui header">{{ title }}</h1>
+<span id="ticker" class="ui large label">{{ ticker }}</span>
 <span id="changeLabel">{{ change }}</span>
 
-<div class="ui tabular menu">
-    <div class="active item" data-tab="tabHistory">History</div>
-    <div class="item" data-tab="tabBalanceSheet">Balance Sheet</div>
-    <div class="item" data-tab="tabCashflows">Cashflows</div>
-    <div class="item" data-tab="tabDividends">Dividends</div>
+<div class="ui top attached tabular menu">
+    <a class="item active" data-tab="tabBodyHistory">History</a>
+    <a class="item" data-tab="tabBodyBalanceSheet">Balance Sheet</a>
+    <a class="item" data-tab="tabBodyCashflows">Cashflows</a>
+    <a class="item" data-tab="tabBodyDividends">Dividends</a>
 </div>
 
-<div id="tabHistory" class="ui bottom attached tab segment" data-tab="tabHistory">
-    tabHistory
-</div>
-<div id="tabBalanceSheet" class="ui bottom attached tab segment" data-tab="tabBalanceSheet">
-    tabBalanceSheet
-</div>
-<div id="tabCashflows" class="ui bottom attached tab segment" data-tab="tabCashflows">
-    tabCashflows
-</div>
-<div id="tabDividends" class="ui bottom attached tab segment" data-tab="tabDividends">
-    tabDividends
-</div>
+<div class="ui bottom attached tab segment active" data-tab="tabBodyHistory" id="tabBodyHistory">
+    <table class="ui very basic single line table">
+        <tr>
+            <td style="text-align: right;">Market Open</td><td id="open"></td>
+            <td></td>
+            <td style="text-align: right;">Previous Close</td><td id="close"></td>
+            <td></td>
+            <td style="text-align: right;">Day Low</td><td id="low"></td>
+            <td></td>
+            <td style="text-align: right;">Day High</td><td id="high"></td>
+            <td></td>
+        </tr>
+    </table>
+    <div id="historyPlot"></div>
 
+</div>
+<div class="ui bottom attached tab segment" data-tab="tabBodyBalanceSheet">
+    tabBodyBalanceSheet
+</div>
+<div class="ui bottom attached tab segment" data-tab="tabBodyCashflows">
+    tabBodyCashflows
+</div>
+<div class="ui bottom attached tab segment" data-tab="tabBodyDividends">
+    tabBodyDividends
+</div>
 
 {% endblock %}

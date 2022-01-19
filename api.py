@@ -3,7 +3,9 @@ from fastapi import templating
 from numpy import double
 from fastapi import FastAPI, Request, Depends, BackgroundTasks
 from fastapi.templating import Jinja2Templates
+from openpyxl import load_workbook
 from sqlalchemy.orm import Session, session
+import uvicorn
 import yfinance as yf
 from classes.stock import Stock
 
@@ -104,24 +106,42 @@ async def watchlistRemoveStock(stockRequest: StockRequest, backgroundTasks: Back
 # Get info about a specific stock /finances/stocks/[ticker]
 @app.get("/finances/stocks/{ticker}")
 def stockinfo(request: Request, ticker: str): 
-
     stock = yf.Ticker(ticker)
-    history = stock.history(period='5y').Close
-    name = stock.info['shortName'],
-    change = str(round(100 / history[-2] * (history[-1] -  history[-2]), 2)) + ' %'
-    # value
-    # volume
-    # pe
-    # yield
-    # is in portfolio or watchlist
+    name = stock.info['shortName']
 
     dataDict = {
         "request" : request,
         "title" : name,
-        "ticker" : ticker.upper(),
-        "history" : history,
-        "change" : change
+        "ticker" : ticker.upper()
     }
     return templates.TemplateResponse("stock.html", dataDict)
 
+
+@app.get("/finances/stocks/{ticker}/getData")
+def stockinfo(request: Request, ticker: str): 
+
+    stock = yf.Ticker(ticker)
+    history = stock.history(period='5y').Close
+    close = stock.info['regularMarketPreviousClose']
+    change = str(round(100 / history[-2] * (history[-1] -  history[-2]), 2)) + ' %'
+    open = stock.info['regularMarketOpen']
+    low = stock.info['regularMarketDayLow']
+    high = stock.info['regularMarketDayHigh']
+    sector = stock.info['sector']
+
+    dataDict = {
+        "history" : dict(history),
+        "close" : close,
+        "open" : open,
+        "high" : high,
+        "low" : low,
+        "change" : change,
+        "sector" : sector
+    }
+    return dataDict
+
  # endregion
+
+
+if __name__ == '__main__':
+     uvicorn.run(app)
