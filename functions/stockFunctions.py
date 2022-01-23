@@ -20,13 +20,13 @@ from database.models import Stock as dbModelStock
 def fetchStockDataPortfolio():
     # fetch tickers from database
     db = SessionLocal()
-    dbStocks = db.query(dbModelStock).filter(and_(dbModelStock.buyPrice != None, dbModelStock.buyAmount != None, dbModelStock.buyFeeEur != None)).all()
+    dbStocks = db.query(dbModelStock).filter(and_(dbModelStock.buyDate != None, dbModelStock.buyAmount != None, dbModelStock.buyFeeEur != None)).all()
     if not dbStocks: return None
     tickers = []
     stocks = []
     for d in dbStocks:
         tickers.append(d.ticker)
-        stocks.append([d.ticker, d.buyPrice, d.buyAmount, d.buyFeeEur])
+        stocks.append([d.ticker, d.buyDate, d.buyAmount, d.buyFeeEur])
 
     # fetch data from yahoo finance
     data = yf.download(tickers, start=date.today() - timedelta(days = 5 * 365), end=date.today(), group_by="ticker")
@@ -34,17 +34,18 @@ def fetchStockDataPortfolio():
     # create stock objects
     portfolioStocks = []
     if len(tickers) == 1:
-        portfolioStocks.append(stk.Stock(tickers[0], data))
+        portfolioStocks.append(stk.Stock(tickers[0], data, stocks[0][1], stocks[0][2], stocks[0][3]))
     else:
         for i, s in enumerate(tickers):
-            portfolioStocks.append(stk.Stock(stocks[i][0], data[s], float(stocks[i][1]), float(stocks[i][2]), float(stocks[i][3])))
+            portfolioStocks.append(stk.Stock(stocks[i][0], data[s], stocks[i][1], float(stocks[i][2]), float(stocks[i][3])))
+
     return portfolioStocks
 
 
 def fetchStockDataWatchlist():
     # fetch tickers from database
     db = SessionLocal()
-    dbStocks = db.query(dbModelStock).filter(or_(dbModelStock.buyPrice == None, dbModelStock.buyAmount == None, dbModelStock.buyFeeEur == None)).all()
+    dbStocks = db.query(dbModelStock).filter(or_(dbModelStock.buyAmount == None, dbModelStock.buyFeeEur == None)).all()
     if not dbStocks: return None
     tickers = []
     for d in dbStocks:
@@ -63,12 +64,12 @@ def fetchStockDataWatchlist():
     return watchlistStocks
 
 
-def saveStockToDB(ticker, buyPrice=0, buyAmount=0, buyFeeEur=0):
+def saveStockToDB(ticker, buyDate=None, buyAmount=0, buyFeeEur=0):
     db = SessionLocal()
     dbStock = dbModelStock()
     dbStock.ticker = ticker.upper()
-    if buyPrice > 0 and buyAmount > 0 and buyFeeEur > 0:
-        dbStock.buyPrice = buyPrice
+    if buyDate != None and buyAmount > 0 and buyFeeEur > 0:
+        dbStock.buyDate = buyDate
         dbStock.buyAmount = buyAmount
         dbStock.buyFeeEur = buyFeeEur
     try:

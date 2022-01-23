@@ -14,6 +14,11 @@
                 $("#home").click(function() {
                     window.location.replace("/");
                 });
+
+                //finances
+                $("#finances").click(function() {
+                    window.location.replace("/finances");
+                });
                 
                 //portfolio
                 $("#portfolio").click(function() {
@@ -28,36 +33,29 @@
         </script>
     </head>
     <body class="body">
-        <div style="display: flex;">
-            <div class="ui vertical menu" style="background-color: rgb(224, 225, 226);">
-                
-                <div class="ui container">
-                    <div class="ui icon header">
-                        <i class="chart area icon"></i>
-                        Daniel Kofler
-                    </div>
-                </div>
-
+        <div style="height: 25ex;">
+            <br>
+            <h1 class="ui center aligned header" style="font-size: 7ex;">
+                <i class="globe icon"></i>
+                Daniel Kofler
+            </h1>
+            <div class="ui secondary menu" style="width: 100%;">
                 <a id="home" class="item">
-                    <div class="header">
-                        <h3 style="padding: 0%;">Home</h3>
-                    </div>
+                  Home
                 </a>
-
                 <a id="finances" class="item">
-                    <h3 style="padding: 0%;">Finances</h3>
+                  Finances
                 </a>
-                <div class="menu">
-                    <a id="portfolio" class="item">
-                        <h5 style="padding: 0%;">Portfolio</h3>
-                    </a>
-                    <a id="watchlist" class="item">
-                        <h5 style="padding: 0%;">Watchlist</h5>
+                <div class="right menu">
+                    <a class="ui item">
+                        Logout
                     </a>
                 </div>
-            </div>
+              </div>
+        </div>
 
-            <div class="ui container" style="padding: 5ex;">
+        <div>
+            <div>
                 {% block content %}
             
                 {% endblock %}

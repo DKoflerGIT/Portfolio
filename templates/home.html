@@ -2,11 +2,20 @@
 
 {% block content %}
 
-<div class="ui breadcrumb">
-    <div class="section"><a href="http://127.0.0.1:8000/"><i class="home icon"></i></a></div>
-
+<div style="display: flex;">
+    <div class="ui breadcrumb" style="background-color: rgb(235, 235, 235); height: 8ex; width: 93%; padding: 3ex;">
+        <div class="section"><a href="http://127.0.0.1:8000/"><i class="home icon"></i></a></div>
+    </div>
+    <div style="background-color: rgb(255, 255, 255); height: 8ex; width: 1%;"></div>
+    <div style="background-color: rgb(5, 94, 226); height: 8ex; width: 5%;"></div>
+    <div style="background-color: rgb(255, 255, 255); height: 8ex; width: 1%;"></div>
 </div>
 
-<h1 class="ui header">{{ title }}</h1>
+<div style="padding: 5ex;">
+    <h1 class="ui header">{{ title }}</h1>
+    <div class="ui container">
+        <iframe width="80%"  height="500ex" src="https://ustream.tv/embed/17074538" allowfullscreen="" title="Live Stream Feed"></iframe>
+    </div>
+</div>
 
 {% endblock %}

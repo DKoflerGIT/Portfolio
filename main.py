@@ -33,6 +33,17 @@ def home(request: Request):
     return templates.TemplateResponse("home.html", dataDict)
 # endregion
 
+# region Finances
+
+@app.get("/finances")
+def home(request: Request):
+    dataDict = {
+        "request" : request,
+        "title" : "Finances"
+    }
+    return templates.TemplateResponse("finances.html", dataDict)
+# endregion
+
 # region Portfolio
 
 # Overview /finances/stocks/portfolio
@@ -43,7 +54,7 @@ def portfolio(request: Request):
     if stocks:
         pStocks = []
         for s in stocks:
-            pStocks.append([s.ticker, s.getValue(), s.calcValue1dChange(), str(s.calcValueChange1dPercent()) + ' %', str(s.calcProfitPercent()) + ' %'])
+            pStocks.append([s.ticker, s.getValue(), s.calcValue1dChange(), str(s.calcValueChange1dPercent()) + ' %', str(s.buyPrice), str(s.calcProfitPercent()) + ' %', s.calcProfit()])
 
     dataDict = {
         "request" : request,
@@ -56,7 +67,7 @@ def portfolio(request: Request):
 # Add a stock /finances/stocks/portfolio/add-stock
 @app.post("/finances/stocks/portfolio/add-stock")
 async def portfolioAddStock(stockRequest: StockRequest, backgroundTasks: BackgroundTasks):
-    backgroundTasks.add_task(sF.saveStockToDB(stockRequest.ticker, stockRequest.buyPrice, stockRequest.buyAmount, stockRequest.buyFeeEur))
+    backgroundTasks.add_task(sF.saveStockToDB(stockRequest.ticker, stockRequest.buyDate, stockRequest.buyAmount, stockRequest.buyFeeEur))
 
 
 # Remove a stock /finances/stocks/portfolio/remove-stock
@@ -128,6 +139,7 @@ def stockinfo(request: Request, ticker: str):
     low = stock.info['regularMarketDayLow']
     high = stock.info['regularMarketDayHigh']
     sector = stock.info['sector']
+    news = stock.news
 
     dataDict = {
         "history" : dict(history),
@@ -136,7 +148,8 @@ def stockinfo(request: Request, ticker: str):
         "high" : high,
         "low" : low,
         "change" : change,
-        "sector" : sector
+        "sector" : sector,
+        "news" : news
     }
     return dataDict
 
