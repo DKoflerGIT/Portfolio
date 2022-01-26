@@ -12,6 +12,16 @@
             }
         });
 
+        $("#finance_dashboard").click(function() {
+            window.location.replace("/finances/dashboard");
+        });
+        $("#finance_portfolio").click(function() {
+            window.location.replace("/finances/stocks/portfolio");
+        });
+        $("#finance_watchlist").click(function() {
+            window.location.replace("/finances/stocks/watchlist");
+        });
+
         // Get the input field
         var input = document.getElementById("searchText");
 
@@ -28,14 +38,15 @@
     });
 </script>
 
+<!-- Breadcrumbs -->
 <div style="display: flex;">
-    <div class="ui breadcrumb" style="background-color: rgb(235, 235, 235); height: 8ex; width: 93%; padding: 3ex;">
+    <div class="ui breadcrumb" style="background-color: rgb(235, 235, 235); height: 8ex; width: 93%; padding: 3ex; border-radius: 0ex 2ex 2ex 0ex;">
         <div class="section"><a href="http://127.0.0.1:8000/"><i class="home icon"></i></a></div>
         <i class="right chevron icon divider"></i>
         <div class="section">Finances</div>
     </div>
     <div style="background-color: rgb(255, 255, 255); height: 8ex; width: 1%;"></div>
-    <div style="background-color: rgb(5, 94, 226); height: 8ex; width: 5%;"></div>
+    <div style="background-color: rgb(5, 94, 226); height: 8ex; width: 5%; border-radius: 2ex 2ex 2ex 2ex;"></div>
     <div style="background-color: rgb(255, 255, 255); height: 8ex; width: 1%;"></div>
 </div>
 
@@ -45,8 +56,16 @@
     <div class="ui three column grid">
         <div class="column">
             <div class="ui segment">
+                <h5 style="padding: 0%;">Dashboard</h5>
+                <button id="finance_dashboard" class="circular ui icon button">
+                    <i class="icon arrow right"></i>
+                </button>
+            </div>
+        </div>
+        <div class="column">
+            <div class="ui segment">
                 <h5 style="padding: 0%;">Portfolio</h5>
-                <button id="portfolio" class="circular ui icon button">
+                <button id="finance_portfolio" class="circular ui icon button">
                     <i class="icon arrow right"></i>
                 </button>
             </div>
@@ -54,7 +73,7 @@
         <div class="column">
             <div class="ui segment">
                 <h5 style="padding: 0%;">Watchlist</h5>
-                <button id="watchlist" class="circular ui icon button">
+                <button id="finance_watchlist" class="circular ui icon button">
                     <i class="icon arrow right"></i>
                 </button>
             </div>
@@ -69,20 +88,6 @@
           </div>
         </div>
     </div>
-
-    <!-- <div class="ui secondary vertical menu" style="background-color: rgb(255, 255, 255);">
-        <a id="portfolio" class="item">
-            <h5 style="padding: 0%;">Portfolio</h3>
-        </a>
-        <a id="watchlist" class="item">
-            <h5 style="padding: 0%;">Watchlist</h5>
-        </a>
-        <div class="ui icon input">
-            <input id="searchText" type="text" placeholder="Search Ticker...">
-            <i id="search" class="search link icon"></i>
-        </div>
-    </div> -->
-
 </div>
 
 {% endblock %}

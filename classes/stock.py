@@ -15,7 +15,13 @@ class Stock():
             self.buyFeeUsd = 0
         else:
             self.buyDate = buyDate
-            self.buyPrice = round(data['Close'][str(buyDate)], 2)
+
+            try: bp = data['Open'][str(buyDate)]
+            except:
+                try: bp = data['Close'][str(buyDate)]
+                except: bp = 0
+
+            self.buyPrice = round(bp, 2)
             self.buyAmount = buyAmount
             self.buyFeeEur = buyFeeEur
             self.buyFeeUsd = hlp.eurToUsd(buyFeeEur)
@@ -44,3 +50,8 @@ class Stock():
         if self.buyPrice == 0:
             return 0
         return round(self.data.Close[-1] * self.buyAmount - self.buyPrice * self.buyAmount, 2)
+    
+    def calcEquity(self):
+        if self.buyPrice == 0:
+            return 0
+        return round(self.data.Close[-1] * self.buyAmount, 2)

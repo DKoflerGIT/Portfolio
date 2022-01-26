@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<script>
+    $(document).ready(function() {
+        $("#search").click(function() {
+            let ticker = $("#searchText").val();
+
+            if (ticker != "") {
+                window.location.replace("/finances/stocks/" + ticker);
+            }
+        });
+
+        // Get the input field
+        var input = document.getElementById("searchText");
+
+        // Execute a function when the user releases a key on the keyboard
+        input.addEventListener("keyup", function(event) {
+            // Number 13 is the "Enter" key on the keyboard
+            if (event.keyCode === 13) {
+                // Cancel the default action, if needed
+                event.preventDefault();
+                // Trigger the button element with a click
+                document.getElementById("search").click();
+            }
+        });
+    });
+</script>
+
+<!-- Breadcrumbs -->
+<div style="display: flex;">
+    <div class="ui breadcrumb" style="background-color: rgb(235, 235, 235); height: 8ex; width: 93%; padding: 3ex; border-radius: 0ex 2ex 2ex 0ex;">
+        <div class="section"><a href="http://127.0.0.1:8000/"><i class="home icon"></i></a></div>
+        <i class="right chevron icon divider"></i>
+        <div class="section"><a href="http://127.0.0.1:8000/finances">Finances</a></div>
+        <i class="right chevron icon divider"></i>
+        <div class="section">Dashboard</div>
+    </div>
+    <div style="background-color: rgb(255, 255, 255); height: 8ex; width: 1%;"></div>
+    <div style="background-color: rgb(5, 94, 226); height: 8ex; width: 5%; border-radius: 2ex 2ex 2ex 2ex;"></div>
+    <div style="background-color: rgb(255, 255, 255); height: 8ex; width: 1%;"></div>
+</div>
+
+<div style="padding: 5ex;">
+    <h1 class="ui header"><i class="chart pie icon"></i> {{ title }}</h1>
+
+</div>
+
+{% endblock %}

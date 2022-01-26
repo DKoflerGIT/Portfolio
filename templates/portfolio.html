@@ -81,34 +81,31 @@
             //color fields
             let v;
             for(let i = 1; i <= n; i++) {
-                //color value change fields
-                v =parseFloat($("#valueChange" + [i]).text());
-                if(v < 0) $("#valueChange" + [i]).addClass("ui large red label");
-                else if (v > 0) $("#valueChange" + [i]).addClass("ui large green label");
-
                 //color relative value change fields
-                v =$("#relValueChange" + [i]).text();
-                v = parseFloat(v.substring(0, v.length - 2));
-                if(v < 0) $("#relValueChange" + [i]).addClass("ui large red label");
-                else if (v > 0) $("#relValueChange" + [i]).addClass("ui large green label");
+                v_orig =$("#relValueChange" + [i]).text();
+                v = parseFloat(v_orig.substring(0, v_orig.length - 2));
+                if(v < 0) $("#relValueChange" + [i]).addClass("ui large red basic label");
+                else if (v > 0){
+                    $("#relValueChange" + [i]).addClass("ui large green basic label");
+                    $("#relValueChange" + [i]).text("+" + v_orig);
+                }
 
                 //color relative profit fields
-                v =$("#relProfit" + [i]).text();
-                v = parseFloat(v.substring(0, v.length - 2));
-                if(v < 0) $("#relProfit" + [i]).addClass("ui large red label");
-                else if (v > 0) $("#relProfit" + [i]).addClass("ui large green label");
-
-                //color profit fields
-                v =parseFloat($("#profit" + [i]).text());
-                if(v < 0) $("#profit" + [i]).addClass("ui large red label");
-                else if (v > 0) $("#profit" + [i]).addClass("ui large green label");
+                v_orig =$("#relProfit" + [i]).text();
+                v = parseFloat(v_orig.substring(0, v_orig.length - 2));
+                if(v < 0) $("#relProfit" + [i]).addClass("ui large basic red label");
+                else if (v > 0) {
+                    $("#relProfit" + [i]).addClass("ui large basic green label");
+                    $("#relProfit" + [i]).text("+" + v_orig);
+                }
             }
         }
     });
 </script>
 
+<!-- Breadcrumbs -->
 <div style="display: flex;">
-    <div class="ui breadcrumb" style="background-color: rgb(235, 235, 235); height: 8ex; width: 93%; padding: 3ex;">
+    <div class="ui breadcrumb" style="background-color: rgb(235, 235, 235); height: 8ex; width: 93%; padding: 3ex; border-radius: 0ex 2ex 2ex 0ex;">
         <div class="section"><a href="http://127.0.0.1:8000/"><i class="home icon"></i></a></div>
         <i class="right chevron icon divider"></i>
         <div class="section"><a href="http://127.0.0.1:8000/finances">Finances</a></div>
@@ -116,12 +113,12 @@
         <div class="section">Portfolio</div>
     </div>
     <div style="background-color: rgb(255, 255, 255); height: 8ex; width: 1%;"></div>
-    <div style="background-color: rgb(5, 94, 226); height: 8ex; width: 5%;"></div>
+    <div style="background-color: rgb(5, 94, 226); height: 8ex; width: 5%; border-radius: 2ex 2ex 2ex 2ex;"></div>
     <div style="background-color: rgb(255, 255, 255); height: 8ex; width: 1%;"></div>
 </div>
 
 <div style="padding: 5ex;">
-    <h1 class="ui header">{{ title }}</h1>
+    <h1 class="ui header"><i class="chart line icon"></i> {{ title }}</h1>
     <div class="ui container">
 
         <!-- Modal to add a stock to the watchlist -->
@@ -205,14 +202,13 @@
         <table id="stockTable" class="ui very basic single line table">
             <thead>
                 <tr>
-                    <th><h3 class="ui header">Ticker</h3></th>
-                    <th><h3 class="ui header">Value</h3></th>
-                    <th><h3 class="ui header">1D Change</h3></th>
-                    <th><h3 class="ui header">1D Change %</h3></th>
-                    <th><h3 class="ui header">Buy Value</h3></th>
-                    <th><h3 class="ui header">Gain/Loss %</h3></th>
-                    <th><h3 class="ui header">Gain/Loss</h3></th>
-                    <th><h3 class="ui header"></h3></th>
+                    <th><h5 class="ui header">Ticker</h5></th>
+                    <th><h5 class="ui header">Value</h5></th>
+                    <th><h5 class="ui header">1D %</h5></th>
+                    <th><h5 class="ui header">Buy Value</h5></th>
+                    <th><h5 class="ui header">Profit %</h5></th>
+                    <th><h5 class="ui header">Equity</h5></th>
+                    <th><h5 class="ui header"></h5></th>
                 </tr>
             </thead>
             <tbody id="tableBody">
@@ -221,18 +217,21 @@
                     <tr>
                         <td id="ticker{{loop.index}}">{{ stock[0] }}</td>
                         <td>{{ stock[1] }}</td>
-                        <td><p id="valueChange{{loop.index}}">{{ stock[2] }}</p></td>
                         <td><p id="relValueChange{{loop.index}}">{{ stock[3] }}</p></td>
                         <td><p>{{ stock[4] }}</p></td>
                         <td><p id="relProfit{{loop.index}}">{{ stock[5] }}</p></td>
-                        <td><p id="profit{{loop.index}}">{{ stock[6] }}</p></td>
+                        <td><p id="equity{{loop.index}}">{{ stock[7] }}</p></td>
                         <td>
-                            <button class="ui icon button" tabindex="{{ 3 + loop.index }}" id="deleteStock{{ loop.index }}">
-                                <i class="trash icon"></i>
+                            <button class="ui icon button" tabindex="{{ 4 + loop.index }}" id="myStock{{ loop.index }}">
+                                <i class="info icon"></i>
                             </button>
                                 
-                            <button class="ui icon button" tabindex="{{ 4 + loop.index }}" id="viewStock{{ loop.index }}">
-                                <i class="search icon"></i>
+                            <button class="ui icon button" tabindex="{{ 5 + loop.index }}" id="viewStock{{ loop.index }}">
+                                <i class="chart line icon"></i>
+                            </button>
+
+                            <button class="ui icon button" tabindex="{{ 6 + loop.index }}" id="deleteStock{{ loop.index }}">
+                                <i class="trash icon"></i>
                             </button>
                         </td>
                     </tr>
@@ -247,8 +246,8 @@
                             {{ stocks|length }}
                         {% else %}
                             0
-                        {% endif %}</th>
-                    <th></th>
+                        {% endif %}
+                    </th>
                     <th></th>
                     <th></th>
                     <th></th>

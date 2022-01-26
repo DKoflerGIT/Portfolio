@@ -20,7 +20,7 @@ from database.models import Stock as dbModelStock
 def fetchStockDataPortfolio():
     # fetch tickers from database
     db = SessionLocal()
-    dbStocks = db.query(dbModelStock).filter(and_(dbModelStock.buyDate != None, dbModelStock.buyAmount != None, dbModelStock.buyFeeEur != None)).all()
+    dbStocks = db.query(dbModelStock).filter(and_(dbModelStock.buyDate != None, dbModelStock.buyAmount != None, dbModelStock.buyFeeEur != None)).order_by(dbModelStock.ticker.asc()).all()
     if not dbStocks: return None
     tickers = []
     stocks = []
@@ -29,7 +29,7 @@ def fetchStockDataPortfolio():
         stocks.append([d.ticker, d.buyDate, d.buyAmount, d.buyFeeEur])
 
     # fetch data from yahoo finance
-    data = yf.download(tickers, start=date.today() - timedelta(days = 5 * 365), end=date.today(), group_by="ticker")
+    data = yf.download(tickers, period='5y', group_by="ticker")
     
     # create stock objects
     portfolioStocks = []
@@ -52,7 +52,7 @@ def fetchStockDataWatchlist():
         tickers.append(d.ticker)
 
     # fetch data from yahoo finance
-    data = yf.download(tickers, start=date.today() - timedelta(days = 5 * 365), end=date.today(), group_by="ticker")
+    data = yf.download(tickers, period='5y', group_by="ticker")
     
     # create stock objects
     watchlistStocks = []

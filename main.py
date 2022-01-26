@@ -44,6 +44,17 @@ def home(request: Request):
     return templates.TemplateResponse("finances.html", dataDict)
 # endregion
 
+# region Dashboard
+
+@app.get("/finances/dashboard")
+def home(request: Request):
+    dataDict = {
+        "request" : request,
+        "title" : "Dashboard"
+    }
+    return templates.TemplateResponse("dashboard.html", dataDict)
+# endregion
+
 # region Portfolio
 
 # Overview /finances/stocks/portfolio
@@ -54,7 +65,16 @@ def portfolio(request: Request):
     if stocks:
         pStocks = []
         for s in stocks:
-            pStocks.append([s.ticker, s.getValue(), s.calcValue1dChange(), str(s.calcValueChange1dPercent()) + ' %', str(s.buyPrice), str(s.calcProfitPercent()) + ' %', s.calcProfit()])
+            pStocks.append([
+                s.ticker,
+                s.getValue(),
+                s.calcValue1dChange(),
+                str(s.calcValueChange1dPercent()) + ' %',
+                str(s.buyPrice),
+                str(s.calcProfitPercent()) + ' %',
+                s.calcProfit(),
+                s.calcEquity()
+            ])
 
     dataDict = {
         "request" : request,
@@ -132,14 +152,17 @@ def stockinfo(request: Request, ticker: str):
 def stockinfo(request: Request, ticker: str): 
 
     stock = yf.Ticker(ticker)
+    info = stock.info
     history = stock.history(period='5y').Close
-    close = stock.info['regularMarketPreviousClose']
+    close = info['regularMarketPreviousClose']
     change = str(round(100 / history[-2] * (history[-1] -  history[-2]), 2)) + ' %'
-    open = stock.info['regularMarketOpen']
-    low = stock.info['regularMarketDayLow']
-    high = stock.info['regularMarketDayHigh']
-    sector = stock.info['sector']
+    open = info['regularMarketOpen']
+    low = info['regularMarketDayLow']
+    high = info['regularMarketDayHigh']
+    sector = info['sector']
     news = stock.news
+    exchange = info['exchange']
+    currency = info['financialCurrency']
 
     dataDict = {
         "history" : dict(history),
@@ -149,12 +172,49 @@ def stockinfo(request: Request, ticker: str):
         "low" : low,
         "change" : change,
         "sector" : sector,
-        "news" : news
+        "news" : news,
+        "exchange" : exchange,
+        "currency" : currency
+    }
+    return dataDict
+
+
+@app.get("/finances/stocks/{ticker}/getDataBalanceSheet")
+def stockinfo(request: Request, ticker: str): 
+
+    stock = yf.Ticker(ticker)
+    balanceSheet = stock.balance_sheet
+
+    dataDict = {
+        "balanceSheet" : dict(balanceSheet)
+    }
+    return dataDict
+
+
+@app.get("/finances/stocks/{ticker}/getDataFinancials")
+def stockinfo(request: Request, ticker: str): 
+
+    stock = yf.Ticker(ticker)
+    financials = stock.financials
+
+    dataDict = {
+        "financials" : dict(financials)
+    }
+    return dataDict
+
+
+@app.get("/finances/stocks/{ticker}/getDataCashflow")
+def stockinfo(request: Request, ticker: str): 
+
+    stock = yf.Ticker(ticker)
+    cashflow = stock.cashflow
+
+    dataDict = {
+        "cashflow" : dict(cashflow)
     }
     return dataDict
 
  # endregion
-
 
 if __name__ == '__main__':
      uvicorn.run(app)

@@ -79,23 +79,30 @@
             let v;
             for(let i = 1; i <= n; i++) {
                 //color value change fields
-                v =$("#valueChange" + [i]).text();
-                v = parseFloat(v.substring(0, v.length));
-                if(v < 0) $("#valueChange" + [i]).addClass("ui large red label");
-                else if (v > 0) $("#valueChange" + [i]).addClass("ui large green label");
+                v_orig =$("#valueChange" + [i]).text();
+                v = parseFloat(v_orig.substring(0, v_orig.length));
+                if(v < 0) $("#valueChange" + [i]).addClass("ui large red basic label");
+                else if (v > 0) {
+                    $("#valueChange" + [i]).addClass("ui large green basic label");
+                    $("#valueChange" + [i]).text("+" + v_orig);
+                }
 
                 //color relative value change fields
-                v =$("#relValueChange" + [i]).text();
-                v = parseFloat(v.substring(0, v.length - 2));
-                if(v < 0) $("#relValueChange" + [i]).addClass("ui large red label");
-                else if (v > 0) $("#relValueChange" + [i]).addClass("ui large green label");
+                v_orig =$("#relValueChange" + [i]).text();
+                v = parseFloat(v_orig.substring(0, v_orig.length - 2));
+                if(v < 0) $("#relValueChange" + [i]).addClass("ui large red basic label");
+                else if (v > 0) {
+                    $("#relValueChange" + [i]).addClass("ui large green basic label");
+                    $("#relValueChange" + [i]).text("+" + v_orig);
+                }
             }
         }
     });
 </script>
 
+<!-- Breadcrumbs -->
 <div style="display: flex;">
-    <div class="ui breadcrumb" style="background-color: rgb(235, 235, 235); height: 8ex; width: 93%; padding: 3ex;">
+    <div class="ui breadcrumb" style="background-color: rgb(235, 235, 235); height: 8ex; width: 93%; padding: 3ex; border-radius: 0ex 2ex 2ex 0ex;">
         <div class="section"><a href="http://127.0.0.1:8000/"><i class="home icon"></i></a></div>
         <i class="right chevron icon divider"></i>
         <div class="section"><a href="http://127.0.0.1:8000/finances">Finances</a></div>
@@ -103,12 +110,12 @@
         <div class="section">Watchlist</div>
     </div>
     <div style="background-color: rgb(255, 255, 255); height: 8ex; width: 1%;"></div>
-    <div style="background-color: rgb(5, 94, 226); height: 8ex; width: 5%;"></div>
+    <div style="background-color: rgb(5, 94, 226); height: 8ex; width: 5%; border-radius: 2ex 2ex 2ex 2ex;"></div>
     <div style="background-color: rgb(255, 255, 255); height: 8ex; width: 1%;"></div>
 </div>
 
 <div style="padding: 5ex;">
-    <h1 class="ui header">{{ title }}</h1>
+    <h1 class="ui header"><i class="list icon"></i> {{ title }}</h1>
     <div class="ui container">
         <!-- Modal to add a stock to the watchlist -->
         <div class="ui tiny modal">
@@ -184,11 +191,11 @@
         <table id="stockTable" class="ui very basic single line table">
             <thead>
                 <tr>
-                    <th><h3 class="ui header">Ticker</h3></th>
-                    <th><h3 class="ui header">Value</h3></th>
-                    <th><h3 class="ui header">1D Change</h3></th>
-                    <th><h3 class="ui header">1D Change %</h3></th>
-                    <th><h3 class="ui header"></h3></th>
+                    <th><h5 class="ui header">Ticker</h5></th>
+                    <th><h5 class="ui header">Value</h5></th>
+                    <th><h5 class="ui header">1D</h5></th>
+                    <th><h5 class="ui header">1D %</h5></th>
+                    <th><h5 class="ui header"></h5></th>
                 </tr>
             </thead>
             <tbody id="tableBody">
@@ -205,7 +212,7 @@
                             </button>
                                 
                             <button class="ui icon button" tabindex="{{ 4 + loop.index }}" id="viewStock{{ loop.index }}">
-                                <i class="search icon"></i>
+                                <i class="chart line icon"></i>
                             </button>
                         </td>
                     </tr>

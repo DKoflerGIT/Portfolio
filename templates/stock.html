@@ -9,32 +9,45 @@
         let ticker = $("#ticker").text();
         let url = '/finances/stocks/' + ticker + '/getData';
 
-        $.get( url, function( data ) {
-            //fill labels with data
-            $("#open").text(data["open"]);
-            $("#close").text(data["close"]);
-            $("#high").text(data["high"]);
-            $("#low").text(data["low"]);
+        //Get Overview Data
+        $.get( url, function( dataO ) {
+            $("#open").text(dataO["open"]);
+            $("#close").text(dataO["close"]);
+            $("#high").text(dataO["high"]);
+            $("#low").text(dataO["low"]);
 
-            var news = data["news"];
-            console.log(news);
-            
             // add news items
+            var news = dataO["news"];
             news.forEach(function (n, i) {
-                jQuery('<div class="item"><h5 class="ui header">' + n["publisher"] + ': </h5><a href="' + n["link"] + '">' + n["title"] + '</a></div>', {
-                    id: 'some-id'
+                jQuery('<div class="column"><div class="ui segment"><h3 class="ui header">' +
+                    n["publisher"] +
+                    '</h3><a href="' +
+                    n["link"] +
+                    '"> ' +
+                    n["title"] +
+                    '</a></div></div>', {
+                        id: 'news' + i
                 }).appendTo('#newsItems');
             });
 
+            $("#exchange").text(dataO["exchange"]);
+            $("#currency").text(", in " + dataO["currency"]);
+
             //color change label
-            v = data["change"];
-            $("#changeLabel").text(v);
-            v = parseFloat(v.substring(0, v.length - 2));
-            if(v < 0) $("#changeLabel").addClass("ui large red label");
-            else if (v > 0) $("#changeLabel").addClass("ui large green label");
+            v_orig = dataO["change"];
+            v = parseFloat(v_orig.substring(0, v_orig.length - 2));
+            if(v < 0) {
+                $("#changeLabel").addClass("ui large red basic label");
+                $("#changeLabel").text(v_orig);
+            }
+
+            else if (v > 0) {
+                $("#changeLabel").addClass("ui large green basic label");
+                $("#changeLabel").text("+" + v_orig);
+            }
 
             //plot history
-            let h = data["history"];
+            let h = dataO["history"];
             let x = [];
             let y = [];
 
@@ -60,23 +73,87 @@
                 }
             };
 
+            var layout = {
+                showlegend: false,
+                xaxis: {
+                    showline: true,
+                    showgrid: false,
+                    showticklabels: true,
+                    linewidth: 2,
+                    autotick: true,
+                    ticks: 'outside'
+                },
+                yaxis: {
+                    showgrid: true,
+                    zeroline: false,
+                    showline: false,
+                    showticklabels: true,
+                    autotick: true
+                },
+                autosize: true,
+                annotations: []
+            };
+
+            var resultLabel = {
+                xref: 'paper',
+                x: 1,
+                y: dataO["close"],
+                xanchor: 'left',
+                yanchor: 'middle',
+                text: dataO["close"],
+                font: {
+                    size: 12,
+                    color: 'rgb(5, 94, 226)'
+                },
+                showarrow: false
+            };
+
+            layout.annotations.push(resultLabel);
             var history = [trace1];
 
             Plotly.newPlot(
                 div,
-                history
+                history,
+                layout
             );
+        },"json");
 
+        //Get Balance Sheet data
+        $("#tabHeaderBalanceSheet").click(function() {
+            let url = '/finances/stocks/' + ticker + '/getDataBalanceSheet';
+            console.log('Fetchning Balance Sheet ...');
+            
+            $.get( url, function( dataB ) {
+                console.log(dataB["balanceSheet"]);
+            });
+        });
 
-        }, "json" );
+        //Get Cashflow data
+        $("#tabHeaderCashflow").click(function() {
+            let url = '/finances/stocks/' + ticker + '/getDataCashflow';
+            console.log('Fetchning Cashflow ...');
+
+            $.get( url, function( dataC ) {
+                console.log(dataC["cashflow"]);
+            });
+        });
+
+        //Get Financials data
+        $("#tabHeaderFinancials").click(function() {
+            let url = '/finances/stocks/' + ticker + '/getDataFinancials';
+            console.log('Fetchning Financials ...');
+
+            $.get( url, function( dataD ) {
+                console.log(dataD["financials"]);
+            });
+        });
     });
 
 </script>
 
-
-
+<!-- Breadcrumbs -->
 <div style="display: flex;">
-    <div class="ui breadcrumb" style="background-color: rgb(235, 235, 235); height: 8ex; width: 93%; padding: 3ex;">
+    <div class="ui breadcrumb" style="background-color: rgb(235, 235, 235); height: 8ex; width: 93%; padding: 3ex; border-radius: 0ex 2ex 2ex 0ex;">
         <div class="section"><a href="http://127.0.0.1:8000/"><i class="home icon"></i></a></div>
         <i class="right chevron icon divider"></i>
         <div class="section"><a href="http://127.0.0.1:8000/finances">Finances</a></div>
@@ -84,7 +161,7 @@
         <div class="section">Stock</div>
     </div>
     <div style="background-color: rgb(255, 255, 255); height: 8ex; width: 1%;"></div>
-    <div style="background-color: rgb(5, 94, 226); height: 8ex; width: 5%;"></div>
+    <div style="background-color: rgb(5, 94, 226); height: 8ex; width: 5%; border-radius: 2ex 2ex 2ex 2ex;"></div>
     <div style="background-color: rgb(255, 255, 255); height: 8ex; width: 1%;"></div>
 </div>
 
@@ -92,14 +169,16 @@
 <div style="padding: 5ex;">
     <h1 id="title" class="ui header">{{ title }}</h1>
     <span id="ticker" class="ui large label">{{ ticker }}</span>
-    <span id="changeLabel">{{ change }}</span>
+    <span id="changeLabel"></span>
+    <span id="exchange"></span>
+    <span id="currency"></span>
 
     <div class="ui top attached tabular menu">
-        <a class="item active" data-tab="tabBodyOverview">Overview</a>
-        <a class="item" data-tab="tabBodyBalanceSheet">Balance Sheet</a>
-        <a class="item" data-tab="tabBodyCashflows">Cashflows</a>
-        <a class="item" data-tab="tabBodyDividends">Dividends</a>
-        <a class="item" data-tab="tabBodyAnalysis">Analysis</a>
+        <a id="tabHeaderOverview" class="item active" data-tab="tabBodyOverview">Overview</a>
+        <a id="tabHeaderBalanceSheet" class="item" data-tab="tabBodyBalanceSheet">Balance Sheet</a>
+        <a id="tabHeaderCashflow" class="item" data-tab="tabBodyCashflows">Cashflow</a>
+        <a id="tabHeaderFinancials" class="item" data-tab="tabBodyFinancials">Financials</a>
+        <a id="tabHeaderAnalysis" class="item" data-tab="tabBodyAnalysis">Analysis</a>
     </div>
 
     <div class="ui bottom attached tab segment active" data-tab="tabBodyOverview" id="tabBodyOverview">
@@ -120,7 +199,7 @@
 
         <div class="ui container">
             <h2 id="newsHeader" class="ui header">News</h1>
-            <div id="newsItems" class="ui divided items"></div>
+            <div id="newsItems" class="ui five column grid"></div>
         </div>
     </div>
     <div class="ui bottom attached tab segment" data-tab="tabBodyBalanceSheet">
@@ -129,8 +208,8 @@
     <div class="ui bottom attached tab segment" data-tab="tabBodyCashflows">
         Cashflows
     </div>
-    <div class="ui bottom attached tab segment" data-tab="tabBodyDividends">
-        Dividends
+    <div class="ui bottom attached tab segment" data-tab="tabBodyFinancials">
+        Financials
     </div>
     <div class="ui bottom attached tab segment" data-tab="tabBodyAnalysis">
         Analysis

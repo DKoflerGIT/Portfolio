@@ -1,59 +1,53 @@
+<!Doctype html>
 <html lang="en">
     <head>
         <title>{{ title }}</title>
-        <!-- <link rel="icon" href="https://www.pngfind.com/pngs/m/415-4153126_png-file-easy-money-icon-png-transparent-png.png" type="image/x-icon"> -->
-        
         <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
         <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
         <script src="https://cdn.plot.ly/plotly-2.8.3.min.js"></script>
+        
         <script>
             $(document).ready(function() {
-                //home
+                // navigation
                 $("#home").click(function() {
                     window.location.replace("/");
                 });
-
-                //finances
-                $("#finances").click(function() {
-                    window.location.replace("/finances");
+                $("#dashboard").click(function() {
+                    window.location.replace("/finances/dashboard");
                 });
-                
-                //portfolio
                 $("#portfolio").click(function() {
                     window.location.replace("/finances/stocks/portfolio");
                 });
-
-                //watchlist
                 $("#watchlist").click(function() {
                     window.location.replace("/finances/stocks/watchlist");
                 });
+
+                $('.dropdown').dropdown({  transition: 'drop' });
             });
         </script>
     </head>
     <body class="body">
-        <div style="height: 25ex;">
-            <br>
-            <h1 class="ui center aligned header" style="font-size: 7ex;">
-                <i class="globe icon"></i>
+        <div id="header" style="padding-bottom: 1ex;">
+            <h1 id="home" class="ui center aligned header" style="font-size: 6ex;padding: 1ex;">
+                <i class="globe icon" style="color: rgb(5, 94, 226);"></i>
                 Daniel Kofler
             </h1>
-            <div class="ui secondary menu" style="width: 100%;">
-                <a id="home" class="item">
-                  Home
-                </a>
-                <a id="finances" class="item">
-                  Finances
-                </a>
-                <div class="right menu">
-                    <a class="ui item">
-                        Logout
-                    </a>
+            <div class="ui secondary menu" style="width: 100%; padding-left: 2ex; padding-right: 2ex;">
+                <div class="ui dropdown item">
+                    Finances
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                        <a id="dashboard" class="item">Dashboard</a>
+                        <a id="portfolio" class="item">Portfolio</a>
+                        <a id="watchlist" class="item">Watchlist</a>
+                    </div>
                 </div>
-              </div>
+            </div>
         </div>
-
         <div>
             <div>
                 {% block content %}
