@@ -4,6 +4,10 @@
 
 <script>
     $(document).ready(function() {
+        var intervalId = setInterval(function() {
+            window.location.reload();
+        }, 30000);
+
         //Modal to add stocks
         $("#addStockOpenModal").click(function() {
             $('.ui.tiny.modal').modal('show');
@@ -248,6 +252,7 @@
                             0
                         {% endif %}
                     </th>
+                    <th></th>
                     <th></th>
                     <th></th>
                     <th></th>

@@ -197,6 +197,31 @@ def stockinfo(request: Request, ticker: str):
     stock = yf.Ticker(ticker)
     financials = stock.financials
 
+    # rename columns to be a nice header
+    rename_dict = {}
+
+    for i in range(len(financials.columns)):
+        rename_dict[financials.columns[i]] = financials.columns[i].strftime("%b %d, %Y")
+
+    financials.rename(columns=rename_dict, inplace=True)
+
+    # fill Nones with empty strings
+    financials.fillna("-", inplace=True)
+
+    # format numbers to be better readable
+    for i in range(len(financials.columns)):
+        c = financials[financials.columns[i]][2]
+        for j in range(len(financials[financials.columns[i]])):
+            f = financials[financials.columns[i]][j]
+
+            if type(f) == float:
+                if c>1000000000:
+                    f /= 1000000000
+                    financials[financials.columns[i]][j] = str(f) + " Bn"
+                else:
+                    f /= 1000000
+                    financials[financials.columns[i]][j] = str(f) + " Mn"
+
     dataDict = {
         "financials" : dict(financials)
     }

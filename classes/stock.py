@@ -39,7 +39,7 @@ class Stock():
     def calcProfit(self):
         if self.buyDate == None:
             return 0
-        return round(self.data['Close'][-1] - self.data[''], 2)
+        return round(self.data['Close'][-1] - self.buyPrice, 2)
 
     def calcProfitPercent(self):
         if self.buyPrice == 0:
